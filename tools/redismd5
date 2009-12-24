@@ -1,0 +1,9 @@
+#!/usr/bin/python
+
+import hashlib, sys, os, redis, glob
+
+r = redis.Redis()
+
+for fn in glob.iglob(os.path.join(sys.argv[1], '*.mp3')):
+    print os.popen('node insmeta.js "%s" %s' % ( os.path.join( sys.argv[1], fn ), hashlib.md5(fn).hexdigest() ) ).read()
+    #r.set( "song:%s"%hashlib.md5(fn).hexdigest(), fn )
