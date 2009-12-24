@@ -1,0 +1,12 @@
+<h2><%= title %></h2>
+
+<h3><strong>Album</strong>: <%= album %></h3>
+<h4><strong>Artist</strong>: <%= artist %></h4>
+
+<dl>
+<dt>Track</dt><dd><%= track %></dd>
+
+<dt>Genre</dt><dd><%= genre %></dd>
+
+<dt>Year</dt><dd><%= year %></dd>
+</dl>
