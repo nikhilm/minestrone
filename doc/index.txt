@@ -1,0 +1,22 @@
+= AppName
+
+AppName is a music streaming server which can be used as a personal player or to run an Internet radio station.
+
+== Features
+
+- Supports mp3/ogg and other formats ( easily extensible )
+- Watches directory for updates
+- Uses the fast V8 Javascript engine and Node.js for evented I/O
+- Uses standard Shoutcast protocol supported by all major players.
+- Extracts and broadcasts file meta-data.
+- Web interface to allow playlist creation.
+- Stats about listeners.
+
+== More Documentation
+ * link:install.html[Install AppName]
+
+== Use-Case
+I visit http://localhost/ and have a list of Artists.
+I can select entire Artist or browse Albums etc. Select songs I want to listen to and then download a custom playlist for to put in the player.
+Have "Top 10" "Featured" "Popular" and so on auto-gen ??
+

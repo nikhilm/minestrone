@@ -1,0 +1,45 @@
+= Installation
+
+To use AppName, you'll require
+
+- http://node.js[node.js]
+- http://code.google.com/p/redis/[Redis]
+- Music :)
+
+== Build
+
+- Redis
+
+--------
+    cd redis-x.xx
+    make
+--------
+
+- node.js - Download a checkout or use +git+
+
+----------
+    git clone git://github.com/ry/node.git 
+    OR
+    click download from http://github.com/ry/node
+    cd node
+    ./configure && make && make install
+----------
+
+- Download and extract AppName
+<Install>
+
+== Run
+- Start Redis
+
+--------
+    cd redis-x.xx
+    ./redis-server
+--------
+
+- Start AppName
+
+--------
+    node AppName.js <music root> [port] # default is port 80
+--------
+
+Now point your browser to http://localhost . You are good to go! Tell your friends to visit
