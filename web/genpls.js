@@ -4,8 +4,8 @@
  */
 
 var sys = require("sys")
-  , redis = require("./../deps/redis/redis")
-  , _ = require("./../deps/underscore")._
+  , redis = require("redis")
+  , _ = require("underscore")._
 
 // endpoint should be a prefix url like http://example.com/play/
 // so that the playlist entries will be http://example.com/play/<hash>
