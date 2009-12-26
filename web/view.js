@@ -1,6 +1,6 @@
 var sys = require('sys')
   , posix = require('posix')
-  , _ = require('./../deps/underscore')._
+  , _ = require('./../deps/underscore/underscore')._
 
 /*
  * Returns a view
@@ -20,10 +20,34 @@ exports.render = function( view ) {
         cb = arguments[2];
     }
 
-    posix.cat('views/'+view+'.tp').addCallback( function( content ) {
+    var path = process.ENV['APPNAME_PATH'] + '/web/views/' + view + '.tp';
+    posix.cat(path).addCallback( function( content ) {
         cb( _.template( content, data ) );
     })
     .addErrback( function() {
-        throw "Error loading view " + view;
+        throw new Error( "Error loading view " + view );
+    });
+}
+
+/*
+ * Expects a response object and directly calls
+ * response.respond() with the final render
+ * after including header and footer
+ */
+exports.output = function( response, view, data ) {
+    var output = "";
+
+    exports.render( 'header', {}, function(c) {
+        output += c;
+
+        exports.render( view, data, function(c) {
+            output += c;
+
+            exports.render( 'footer', {}, function(c) {
+                output += c;
+
+                response.respond( output );
+            });
+        });
     });
 }
