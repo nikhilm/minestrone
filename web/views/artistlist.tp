@@ -1,0 +1,6 @@
+<%  %>
+<ul>
+<% for( var artist in artists ) { %>
+<li><%= artist %></li>
+<% } %>
+</ul>
