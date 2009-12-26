@@ -3,7 +3,7 @@ var sys = require('sys');
 var nerve = require('./../deps/nerve/nerve');
 var pls = require('./genpls');
 var redis = require('./../deps/redis/redis');
-var utils = require('./utils');
+var view = require('./view');
 
 function listSongs(req, res) {
     var r = new redis.Client();
@@ -12,7 +12,7 @@ function listSongs(req, res) {
         r.keys('song:*').addCallback( function(songlist) {
             _.each(songlist, function( songkey, i ) {
                 r.get(songkey).addCallback( function( songdata ) {
-                    utils.render('info', JSON.parse(songdata), function(out) {
+                    view.render('info', JSON.parse(songdata), function(out) {
                         resp += out;
                     });
                     if( i == songlist.length-1 ) {
