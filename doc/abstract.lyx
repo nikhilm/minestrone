@@ -1,0 +1,570 @@
+#LyX 1.6.5 created this file. For more info see http://www.lyx.org/
+\lyxformat 345
+\begin_document
+\begin_header
+\textclass paper
+\use_default_options true
+\language english
+\inputencoding auto
+\font_roman times
+\font_sans avant
+\font_typewriter default
+\font_default_family rmdefault
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\paperfontsize 12
+\spacing single
+\use_hyperref true
+\pdf_author "Nikhil Marathe"
+\pdf_keywords "techfest, opensoftware"
+\pdf_bookmarks true
+\pdf_bookmarksnumbered false
+\pdf_bookmarksopen true
+\pdf_bookmarksopenlevel 2
+\pdf_breaklinks false
+\pdf_pdfborder true
+\pdf_colorlinks true
+\pdf_backref section
+\pdf_pdfusetitle true
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\author "" 
+\author "" 
+\end_header
+
+\begin_body
+
+\begin_layout Title
+AppName
+\end_layout
+
+\begin_layout SubTitle
+Team: OS1347
+\end_layout
+
+\begin_layout Author
+Nikhil Marathe
+\end_layout
+
+\begin_layout Institution
+DA-IICT, Gandhinagar
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+AppName is a 
+\shape italic
+\size footnotesize
+music streaming server.
+\end_layout
+
+\begin_layout Standard
+It allows users on a network to listen to tracks from a common source, to
+ browse the collection and create playlists.
+ It features simple configuration and is capable of handling thousands of
+ requests simultaneously due to the underlying architecture ( explained
+ later ).
+ It can be used within internal networks or over the Internet.
+ Since it uses the SHOUTcast protocol, it is supported by virtually all
+ the popular players on all platforms.
+\end_layout
+
+\begin_layout Section
+About AppName
+\end_layout
+
+\begin_layout Standard
+This section discusses the architecture and implementation of AppName.
+\end_layout
+
+\begin_layout Subsection
+Underlying Technologies
+\end_layout
+
+\begin_layout Standard
+According to me AppName is distinctive because of the choice of technologies
+ it uses.
+ While most of today's servers ( of any kind ) use languages like C or C++,
+ AppName uses JavaScript!
+\end_layout
+
+\begin_layout Standard
+The node
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+evented I/O for V8 JavaScript, 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://nodejs.org/"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ project by Ryan Dahl, along with Google's excellent V8
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset CommandInset href
+LatexCommand href
+target "http://code.google.com/apis/v8/"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ JavaScript engine allows execution of the language outside of the browser.
+ In addition, rather than use multiple threads -- one per request -- the
+ evented I/O model is used, wherein a central event loop drives the entire
+ system.
+\end_layout
+
+\begin_layout Standard
+Whenever a potentially slow ( in terms of processor cycles ) task has to
+ performed, it is delegated, a callback is attached and the processor is
+ kept busy with other tasks while the I/O bound process waits for completion.
+ On completion the callback is invoked and that task can resume.
+ This fits in perfectly with JavaScript's event based execution model.
+ At the same time it prevents performance issues caused by multiple threads
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+The C10K problem, 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://www.kegel.com/c10k.html"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+( AppName hasn't been tested with hundreds of simultaneous clients, I believe
+ it would work just fine ).
+\end_layout
+
+\begin_layout Standard
+The V8 engine is already well known for its speed, achieveing performance
+ by compiling JavaScript to native code
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset CommandInset href
+LatexCommand href
+target "http://code.google.com/apis/v8/design.html"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Similarly, for the database rather than go with a Relational database, a
+ key-value store is used.
+ The Redis
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset CommandInset href
+LatexCommand href
+target "http://code.google.com/p/redis/"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ key-value store supports atomic operations on strings, lists and sets,
+ while giving about a 100000 operations/second
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset CommandInset href
+LatexCommand href
+target "http://code.google.com/p/redis/wiki/Benchmarks"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Architecture of AppName
+\end_layout
+
+\begin_layout Standard
+Taking advantage of asynchronous I/O, here is a high-level view of the AppName
+ stack.
+\end_layout
+
+\begin_layout Enumerate
+Client connects to server
+\end_layout
+
+\begin_layout Enumerate
+If he is a user with a web browser, he browses tracks or creates playlists.
+\end_layout
+
+\begin_layout Enumerate
+Once the playlist is created, he copies the URL into the music player.
+\end_layout
+
+\begin_layout Enumerate
+The player connects to the server and receives mp3 data which it plays.
+\end_layout
+
+\begin_layout Standard
+<insert graphic>
+\end_layout
+
+\begin_layout Subsubsection
+Protocol
+\end_layout
+
+\begin_layout Standard
+The user interaction is done via normal HTTP with sessions used to store
+ some data.
+ For now, playlists are permanent and public, but in the future support
+ may be added to have them expire after some time or be private
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Commercial-applications"
+
+\end_inset
+
+.
+ The SHOUTcast protocol
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset CommandInset href
+LatexCommand href
+target "http://forums.radiotoolbox.com/viewtopic.php?t=74"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+, used by Nullsoft, is the de-facto standard for HTTP live-streaming and
+ is supported by almost all players.
+ So AppName implements it.
+ The protocol works thus:
+\end_layout
+
+\begin_layout Enumerate
+Client sends a normal HTTP 
+\family typewriter
+\size footnotesize
+GET
+\family default
+\size default
+ to the URL
+\end_layout
+
+\begin_layout Enumerate
+The server replies with a custom 
+\family typewriter
+\size footnotesize
+ICY 200 OK
+\family default
+\size default
+ header.
+ This is followed by a few headers describing the stream, followed by the
+ actual data
+\end_layout
+
+\begin_layout Enumerate
+When the track changes...
+ TODO
+\end_layout
+
+\begin_layout Subsubsection
+Web Interface
+\end_layout
+
+\begin_layout Standard
+The web interface follows a general Model-View-Controller pattern.
+ nerve provides the routing, with JavaScript functions acting as controllers.
+ A custom view mechanism, which uses the templating engine from underscore.js
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset CommandInset href
+LatexCommand href
+target "http://documentcloud.github.com/underscore/"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ renders the actual HTML.
+ The model is just a thin wrapper over Redis to perform various tasks outlined
+ below.
+\end_layout
+
+\begin_layout Section
+Solving the problem
+\end_layout
+
+\begin_layout Standard
+The principal problems AppName tries to solve are:
+\end_layout
+
+\begin_layout Itemize
+Splitting of Server and Source
+\end_layout
+
+\begin_layout Itemize
+Complicated configuration procedures
+\end_layout
+
+\begin_layout Standard
+<Elaborate> TODO
+\end_layout
+
+\begin_layout Section
+Commercial applications
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Commercial-applications"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+It is a bit odd to see a section on Marketing and Commercialisation in an
+ open source software competition.
+ AppName is released under a liberal MIT license though, and so it is possible
+ to use in a closed environment.
+\end_layout
+
+\begin_layout Standard
+In terms of marketability, I'm sure no one would want to really 
+\emph on
+purchase
+\emph default
+ the product since it has alternatives
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+Icecast, gnump3d, NullSoft's own server
+\end_layout
+
+\end_inset
+
+.
+ But, AppName combines the features of streaming and of a standard server
+ such as gnump3d.
+ In general streaming servers, the data is supposed to be provided by 
+\emph on
+sources
+\emph default
+, external servers or other clients which provide actual music.
+ In such a case if you want to create a simple personal server, not only
+ is setting up the server required, but then you have to configure an external
+ client
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+example: ices, 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://www.icecast.org/ices.php"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+, to which you feed the music.
+\end_layout
+
+\begin_layout Standard
+My basic use case was that if I have multiple computers, at home or in the
+ office, I should be able to listen to my music from anywhere, with the
+ music stored on just one computer.
+ For an end user, configuring a server as well as a streaming source seems
+ tedious.
+ AppName aims to provide a one or two step setup in which the user should
+ simply compile the program and tell it the place where his music is stored
+ and start it up.
+ Now compiling the program might sound hard, but AppName includes all its
+ required software in the download so that just a simple 'make' is required
+ to run it.
+ That said, it runs only on POSIX operating systems, due to the needed support
+ for I/O notifications imposed by software upstream.
+ This does decrease the market significantly, but considering the rapid
+ rise of Linux, especially in home servers ( which are perfect for AppName
+ deployment since that is their entire purpose ) I don't think that should
+ be a problem.
+\end_layout
+
+\begin_layout Standard
+Commercially it would be quite possible to modify AppName such that a subscripti
+on based model is used.
+ Users could be charged a small amount per month to stream the music.
+ I believe AppName could even be crippled.
+ You could make playlists expire after one-time play, save them for up to
+ a week in the 
+\emph on
+Medium
+\emph default
+ plan and indefinitely in the 
+\emph on
+Premium
+\emph default
+ plan or something.
+ The artists you are allowed to browse or listen too could also be restricted
+ by plans.
+ Or the number of songs you can listen to in a certain period.
+\end_layout
+
+\begin_layout Section
+Software used [ remove this when rendering the final pdf ]
+\end_layout
+
+\begin_layout Standard
+This is the software used by AppName in some form or the other.
+ All of it is open source:
+\end_layout
+
+\begin_layout Itemize
+node.js - The program/library providing event-based I/O and bindings to common
+ tasks like file I/O and HTTP for V8.
+ Note that node itself uses several libraries which aren't catalogued here.
+\begin_inset Newline newline
+\end_inset
+
+Ryan Dahl, http://nodejs.org
+\end_layout
+
+\begin_layout Itemize
+V8 - Fast JavaScript engine
+\begin_inset Newline newline
+\end_inset
+
+Google Inc., http://code.google.com/apis/v8/
+\end_layout
+
+\begin_layout Itemize
+nerve - a microframework for node.js.
+ Used for routing and response in the web interface.
+\begin_inset Newline newline
+\end_inset
+
+Greg Ritter, http://github.com/gjritter/nerve/
+\end_layout
+
+\begin_layout Itemize
+Redis - Key-Value store
+\begin_inset Newline newline
+\end_inset
+
+Salvatore Sanfilippo, http://code.google.com/p/redis/
+\end_layout
+
+\begin_layout Itemize
+redis-node-client - node.js bindings for Redis
+\begin_inset Newline newline
+\end_inset
+
+Brian Hammond, http://github.com/fictorial/redis-node-client
+\end_layout
+
+\begin_layout Itemize
+underscore.js - several JavaScript utility functions, functional javascript,
+ templating
+\begin_inset Newline newline
+\end_inset
+
+Jeremy Ashkenas, http://github.com/documentcloud/underscore/
+\end_layout
+
+\begin_layout Itemize
+TagLib - Format agnostic meta-data extractor for common audio formats.
+\begin_inset Newline newline
+\end_inset
+
+Scott Wheeler, http://developer.kde.org/~wheeler/taglib.html
+\end_layout
+
+\begin_layout Itemize
+node-taglib - My JavaScript bindings for TagLib
+\begin_inset Newline newline
+\end_inset
+
+Nikhil Marathe, http://github.com/nikhilm/node-taglib
+\end_layout
+
+\end_body
+\end_document
