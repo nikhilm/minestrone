@@ -1,3 +1,5 @@
 *.node
 *.html
 build/
+deps/redis
+deps/node
