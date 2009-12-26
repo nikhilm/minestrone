@@ -2,23 +2,32 @@ var posix = require("posix");
 var sys = require('sys');
 var nerve = require('./../deps/nerve/nerve');
 var pls = require('./genpls');
-var redis = require('./../deps/redis/redis');
+var redis = require('./../deps/redis-node/redis');
 var view = require('./view');
+var _ = require('./../deps/underscore/underscore')._;
+
+// a little different
+process.mixin( require('./../utils') )
+
+function listArtists(req, res) {
+    view.output( res, 'artistlist', {'artists':[1,2,3,4,5]});
+}
 
 function listSongs(req, res) {
     var r = new redis.Client();
     var resp = "";
     r.connect( function() {
-        r.keys('song:*').addCallback( function(songlist) {
+        r.keys(songk('*')).addCallback( function(songlist) {
             _.each(songlist, function( songkey, i ) {
                 r.get(songkey).addCallback( function( songdata ) {
                     view.render('info', JSON.parse(songdata), function(out) {
                         resp += out;
+
+                        if( i == songlist.length-1 ) {
+                            res.respond( resp );
+                            r.close();
+                        }
                     });
-                    if( i == songlist.length-1 ) {
-                        res.respond( resp );
-                        r.close();
-                    }
                 }).addErrback( function() {
                     res.respond("hi2");
                     res.finish();
@@ -39,12 +48,14 @@ var app = [
         var r = new redis.Client();
         r.connect( function() {
             r.get('song:'+hash).addCallback( function(meta) {
-                utils.render('info', JSON.parse(meta), _(res.respond).bind(res));
+                view.render('info', JSON.parse(meta), _(res.respond).bind(res));
             });
         });
 	}],
 
     [/^\/songs/, listSongs ],
+
+    [/^\/artists/, listArtists ],
 
 	// this handler will respond to any request method
 	[/a.*/, function(req, res) {
@@ -59,6 +70,10 @@ var app = [
 	}]
 	
 ];
+process.addListener("SIGINT", function() {
+    sys.debug("called");
+    process.exit();
+});
 
 // create and serve the application with various options
 nerve.create(app, {
