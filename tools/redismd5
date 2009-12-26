@@ -1,9 +1,12 @@
 #!/usr/bin/python
 
-import hashlib, sys, os, redis, glob
+import hashlib, sys, os, redis, glob, subprocess
 
 r = redis.Redis()
 
+# so that run works
+os.chdir('../')
 for fn in glob.iglob(os.path.join(sys.argv[1], '*.mp3')):
-    print os.popen('node insmeta.js "%s" %s' % ( os.path.join( sys.argv[1], fn ), hashlib.md5(fn).hexdigest() ) ).read()
-    #r.set( "song:%s"%hashlib.md5(fn).hexdigest(), fn )
+    path = os.path.join(sys.argv[1], fn)
+    path.replace(' ', '\\ ')
+    subprocess.call(['./run', 'tools/insmeta.js', path, hashlib.md5(path).hexdigest()] )
