@@ -7,6 +7,7 @@ $NODE_PATH\
 :$APPNAME_PATH/deps/redis-node\
 :$APPNAME_PATH/deps/underscore\
 :$APPNAME_PATH/deps/taglib\
+:$APPNAME_PATH/deps/jssha\
 :$APPNAME_PATH/deps/nerve
 
 node "$@"
