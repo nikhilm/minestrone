@@ -9,8 +9,14 @@ var _ = require('./../deps/underscore/underscore')._;
 // a little different
 process.mixin( require('./../utils') )
 
-function listArtists(req, res) {
-    view.output( res, 'artistlist', {'artists':[1,2,3,4,5]});
+function listArtists(req, res, page) {
+    var r = new redis.Client();
+    r.connect( function() {
+        r.lrange($artistnames(), page*10 || 0, (page*10 || 0)+10).addCallback(
+        function(list) {
+            view.output( res, 'artistlist', {'artists':_(list).map(function(m) { return JSON.parse(m); })});
+        });
+    });
 }
 
 function listSongs(req, res) {
@@ -58,7 +64,7 @@ var app = [
     [/^\/artists/, listArtists ],
 
 	// this handler will respond to any request method
-	[/a.*/, function(req, res) {
+	[/b.*/, function(req, res) {
         var p = new pls.Playlist( "http://localhost/play/" );
         p.generate(1).addCallback( function( r ) {
             res.respond({

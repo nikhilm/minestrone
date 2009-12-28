@@ -1,6 +1,6 @@
 <%  %>
 <ul>
-<% for( var artist in artists ) { %>
-<li><%= artist %></li>
+<% for( var i = 0; i < artists.length ; i++ ) { %>
+<li><a href="artist/<%= artists[i].hash %>"><%= artists[i].artist %></a></li>
 <% } %>
 </ul>
