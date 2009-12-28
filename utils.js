@@ -1,6 +1,6 @@
 var sys = require('sys')
   , posix = require('posix')
-  , _ = require('underscore')
+  , _ = require('underscore')._
 
 /*
  * Accepts a list of arguments and converts it into
@@ -11,15 +11,39 @@ exports.k = function() {
     return [ 'appname' ].concat( _.toArray(arguments) ).join(':');
 }
 
-exports.songk = function(hash) {
+exports.$song = function(hash) {
     return exports.k( 'song', hash );
 }
 
-exports.plsk = function(id) {
-    return exports.k( 'playlist', id );
+exports.$artist = function(hash) {
+    return exports.k( 'artist', hash );
 }
 
-exports.songInfo = function( hash, cb ) {
-    // TODO
-    //return exports.fetch( 'get', exports.songk( hash ), cb );
+// holds artist names and hash
+// since the JSON string is {'artist':'artist name', 'hash': hash }
+// we get automatic alphabetical ordering
+// when using SORT * ALPHA
+exports.$artistnames = function() {
+    return exports.k( 'artistnames' );
+}
+
+// similarly for albums
+exports.$albumnames = function() {
+    return exports.k( 'albumnames' );
+}
+
+exports.$artistsongs = function(hash) {
+    return exports.k( 'artist', hash, 'songs' );
+}
+
+exports.$album = function(hash) {
+    return exports.k( 'album', hash );
+}
+
+exports.$albumsongs = function(hash) {
+    return exports.k( 'album', hash, 'songs' );
+}
+
+exports.$pls = function(id) {
+    return exports.k( 'playlist', id );
 }
