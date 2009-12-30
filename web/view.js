@@ -37,13 +37,15 @@ exports.render = function( view ) {
 exports.output = function( response, view, data ) {
     var output = "";
 
-    exports.render( 'header', {}, function(c) {
+    var hfdata = process.mixin({}, data);
+
+    exports.render( 'header', hfdata, function(c) {
         output += c;
 
         exports.render( view, data, function(c) {
             output += c;
 
-            exports.render( 'footer', {}, function(c) {
+            exports.render( 'footer', hfdata, function(c) {
                 output += c;
 
                 response.respond( output );
