@@ -1,0 +1,19 @@
+<h1><%= title %></h1>
+<table>
+<tr>
+<th>Track</th><th>Song</th> <th>Artist</th>
+</tr>
+<% for( var i = 0; i < songs.length ; i++ ) { %>
+<tr>
+<td>
+    <%= songs[i].track %>
+</td>
+<td>
+    <a href="/song/<%= songs[i].hash %>"><%= songs[i].title %></a>
+</td>
+<td>
+    <a href="/artist/<%= songs[i].artistHash %>"><%= songs[i].artist %></a></li>
+</td>
+</tr>
+<% } %>
+</table>
