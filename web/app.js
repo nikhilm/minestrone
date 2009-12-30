@@ -48,6 +48,33 @@ function artist(req, res, hash) {
     });
 }
 
+function album(req, res, hash) {
+    var r = new redis.Client();
+    var output = {
+        'songs':[]
+    }
+    r.connect( function() {
+        r.smembers( $albumsongs(hash) ).addCallback(
+        function(songs) {
+            _.each( songs, function(song, index) {
+                r.get( $song(song) ).addCallback( function(s) {
+                    output['songs'].push(JSON.parse(s));
+                    if( index == songs.length - 1 ) {
+                        // getting the artist from the song is cheating, but it works
+                        // and is faster and cleaner than another redis query
+                        output['songs'] = _.sortBy( output['songs'], function( song ) {
+                            return song.track;
+                        });
+                        output['title'] = "Songs in " + JSON.parse(s).album;
+                        view.output(res, 'albumsongs', output);
+                    }
+                });
+            });
+        });
+    });
+}
+
+
 function listSongs(req, res) {
     var r = new redis.Client();
     var resp = "";
@@ -91,9 +118,10 @@ var app = [
     [/^\/songs/, listSongs ],
 
     [/^\/artists$/, listArtists ],
-    [/^\/artists\/(\w+)/, listArtists ],
+    [/^\/artists\/(\w+)?/, listArtists ],
 
     [/^\/artist\/(\w+)/, artist],
+    [/^\/album\/(\w+)/, album],
 
 	// this handler will respond to any request method
 //	[/b.*/, function(req, res) {
