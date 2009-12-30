@@ -99,13 +99,16 @@ Collection.prototype.addFile = function( fn ) {
 
     // so that we can list songs by artists and albums
     this.redis.sadd( $artistsongs( info.artistHash ), info.hash );
-    this.redis.sadd( $albumsongs( info.albumHash ), info.hash );
+    // TODO when using collection don't do process.exit
+    this.redis.sadd( $albumsongs( info.albumHash ), info.hash ).addCallback(function() { process.exit(); });
 
 }
 
 var c = new Collection('/shared/music');
 c.addListener( "ready", function() {
-    c.addFile(process.ARGV[2]);
+    _.each( process.ARGV.splice(2), function(fn) {
+        c.addFile(fn.replace(new RegExp("^" + c.root + "?"), ""));
+    } );
 });
 //process.exit();
 
