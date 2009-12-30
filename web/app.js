@@ -10,11 +10,17 @@ var _ = require('./../deps/underscore/underscore')._;
 process.mixin( require('./../utils') )
 
 function listArtists(req, res, page) {
+    page = page || 0;
     var r = new redis.Client();
     r.connect( function() {
         r.lrange($artistnames(), page*10 || 0, (page*10 || 0)+10).addCallback(
         function(list) {
-            view.output( res, 'artistlist', {'artists':_(list).map(function(m) { return JSON.parse(m); })});
+            view.output( res, 'artistlist', {
+                'artists':_.map(list || [], function(m) {
+                            return JSON.parse(m);
+                          })
+                , 'title': 'Artists'
+            });
         });
     });
 }
@@ -61,19 +67,19 @@ var app = [
 
     [/^\/songs/, listSongs ],
 
-    [/^\/artists/, listArtists ],
+    [/^\/artists$/, listArtists ],
+    [/^\/artists\/(\w+)/, listArtists ],
 
 	// this handler will respond to any request method
-	[/b.*/, function(req, res) {
-        var p = new pls.Playlist( "http://localhost/play/" );
-        p.generate(1).addCallback( function( r ) {
-            res.respond({
-                headers: { "Content-Type" : "audio/x-scpls" }
-                , content: r
-            });
-        });
-		
-	}]
+//	[/b.*/, function(req, res) {
+//        var p = new pls.Playlist( "http://localhost/play/" );
+//        p.generate(1).addCallback( function( r ) {
+//            res.respond({
+//                headers: { "Content-Type" : "audio/x-scpls" }
+//                , content: r
+//            });
+//        });
+//  }]
 	
 ];
 process.addListener("SIGINT", function() {
