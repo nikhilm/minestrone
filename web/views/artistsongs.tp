@@ -1,0 +1,6 @@
+<h1><%= title %></h1>
+<ul>
+<% for( var i = 0; i < songs.length ; i++ ) { %>
+<li><a href="/song/<%= songs[i].hash %>"><%= songs[i].title %></a> <a href="/songs/<%= songs[i].albumHash %>"><%= songs[i].album %></a></li>
+<% } %>
+</ul>
