@@ -1,2 +1,6 @@
+<hr>
+<div id="footer">
+<p>Powered by <a href="http://github.com/nikhilm/minestrone">Minestrone</a> version <%= version %>
+</div>
 </body>
 </html>
