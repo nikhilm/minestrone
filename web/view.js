@@ -20,7 +20,7 @@ exports.render = function( view ) {
         cb = arguments[2];
     }
 
-    var path = process.ENV['APPNAME_PATH'] + '/web/views/' + view + '.tp';
+    var path = process.ENV['MINESTRONE_PATH'] + '/web/views/' + view + '.tp';
     posix.cat(path).addCallback( function( content ) {
         cb( _.template( content, data ) );
     })

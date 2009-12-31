@@ -7,8 +7,8 @@ var sys = require('sys')
  * a ':' delimited redis key with prefix
  */
 exports.k = function() {
-    // TODO fix appname
-    return [ 'appname' ].concat( _.toArray(arguments) ).join(':');
+    // TODO fix minestrone
+    return [ 'minestrone' ].concat( _.toArray(arguments) ).join(':');
 }
 
 exports.$song = function(hash) {

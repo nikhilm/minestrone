@@ -1,13 +1,13 @@
 #!/usr/bin/env sh
-export APPNAME_PATH=`pwd`
+export MINESTRONE_PATH=`pwd`
 
 export NODE_PATH=\
 $NODE_PATH\
-:$APPNAME_PATH\
-:$APPNAME_PATH/deps/redis-node\
-:$APPNAME_PATH/deps/underscore\
-:$APPNAME_PATH/deps/taglib\
-:$APPNAME_PATH/deps/jssha\
-:$APPNAME_PATH/deps/nerve
+:$MINESTRONE_PATH\
+:$MINESTRONE_PATH/deps/redis-node\
+:$MINESTRONE_PATH/deps/underscore\
+:$MINESTRONE_PATH/deps/taglib\
+:$MINESTRONE_PATH/deps/jssha\
+:$MINESTRONE_PATH/deps/nerve
 
 node "$@"

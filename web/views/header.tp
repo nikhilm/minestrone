@@ -1,5 +1,5 @@
 <html>
 <head>
-<title>AppName - <%= title %></title>
+<title><%= title %> [Minestrone]</title>
 </head>
 <body>

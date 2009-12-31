@@ -55,7 +55,7 @@
 \begin_body
 
 \begin_layout Title
-AppName
+Minestrone
 \end_layout
 
 \begin_layout SubTitle
@@ -98,7 +98,7 @@ Introduction
 \end_layout
 
 \begin_layout Standard
-AppName is a 
+Minestrone is a 
 \emph on
 music streaming server
 \emph default
@@ -112,15 +112,17 @@ It allows users on a network to listen to tracks from a common source, to
  It can be used within internal networks or over the Internet.
  Since it uses the SHOUTcast protocol, it is supported by virtually all
  popular players on all platforms.
+ A user visits the server, adds tracks he likes to the playlist, puts it
+ into the player and enjoys the tunes.
 \end_layout
 
 \begin_layout Section
-About AppName
+Architecture of Minestrone
 \end_layout
 
 \begin_layout Standard
-This section discusses the architecture and implementation of AppName.
- The principal problems AppName tries to solve are:
+This section discusses the architecture and implementation of Minestrone.
+ The principal problems Minestrone tries to solve are:
 \end_layout
 
 \begin_layout Itemize
@@ -136,19 +138,207 @@ I believe that the Architecture provides a reasonable picture of how this
  is achieved considering the length limit on this abstract.
 \end_layout
 
-\begin_layout Subsection
-Architecture of AppNames
+\begin_layout Subsubsection
+Protocol
+\end_layout
+
+\begin_layout Standard
+The user interaction is done via normal HTTP with sessions used to store
+ some data.
+ For now, playlists are permanent and public, but in the future support
+ may be added to have them expire after some time or be private
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Commercial-applications"
+
+\end_inset
+
+.
+ The SHOUTcast protocol
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset CommandInset href
+LatexCommand href
+target "http://forums.radiotoolbox.com/viewtopic.php?t=74"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+, used by Nullsoft, is the de-facto standard for HTTP live-streaming and
+ is supported by almost all players.
+ So Minestrone implements it.
+ The protocol is shown in the Figures
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "fig:Request-response-architecture"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection
+Web Interface
+\end_layout
+
+\begin_layout Standard
+The web interface follows a general View-Controller pattern.
+ nerve provides the routing, with JavaScript functions acting as controllers.
+ A custom view mechanism, which uses the templating engine from underscore.js
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset CommandInset href
+LatexCommand href
+target "http://documentcloud.github.com/underscore/"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ renders the actual HTML.
+ The model is just a thin wrapper over Redis to perform various tasks outlined
+ in Collection
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Collection"
+
+\end_inset
+
+Using the keys directly, tracks can be listed by Artist or Album.
+ The first time a user clicks 
+\begin_inset Quotes eld
+\end_inset
+
+Add to Playlist
+\begin_inset Quotes erd
+\end_inset
+
+ a session is created and song ids are inserted into it as required.
+ Once the user is done, he can download the generated playlist file and
+ load it into his/her player.
+ Minestrone will automatically stream music to the player.
+\end_layout
+
+\begin_layout Subsubsection
+Collection
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Collection"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The collection is configured simply by setting a top-level root directory.
+ SHA1 hashes are used for uniqueness wherever required.
+ There is a compromise between space and indexing of meta-data.
+ If space is not a constraint, each song could be indexed by all tags like
+ genre, year, and so on ( currently only on artist and album ).
+ Redis keys are created for various attributes.
+ Each song has a key with a JSON dump of its tags.
+ In addition each artist and album has its own key.
+ All songs by a particular artist/album are associated to it with more keys.
+ Each playlist also gets its own key.
+ Certain assumptions are currently made with respect to the collection ie.
+ it is assumed that the collection runs as a single entity, 
+\emph on
+system wide
+\emph default
+, so there is no thread safety code.
+ This could be extended in the future to have a distributed collection spread
+ over multiple disks and multiple Redis databases.
+\end_layout
+
+\begin_layout Section
+Commercial applications
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Commercial-applications"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Minestrone is released under a liberal MIT license though, and so it is
+ possible to use in a closed environment.
+\end_layout
+
+\begin_layout Standard
+In terms of marketability, no one would want to really 
+\emph on
+purchase
+\emph default
+ the product since it has open-source/free alternatives
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+Icecast, gnump3d, NullSoft's own server
+\end_layout
+
+\end_inset
+
+.
+ But, Minestrone combines the features of streaming and of a standard server
+ such as gnump3d.
+ In general streaming servers, the data is supposed to be provided by 
+\emph on
+sources
+\emph default
+, external servers or other clients which provide actual music.
+ These servers are actually meant for internet radio, where such functionality
+ is desirable.
+ But these is overkill for simpler uses.
+\end_layout
+
+\begin_layout Standard
+Minestrone aims to provide a one or two step setup in which the user should
+ simply compile the program and tell it the place where his music is stored
+ and start it up.
+\end_layout
+
+\begin_layout Standard
+Commercially it would be quite possible to modify Minestrone such that a
+ subscription based model is used.
+ Users could be charged a small amount per month to stream the music.
+ Playlists could expire after one-time play for free, save them for up to
+ a week in the 
+\emph on
+Medium
+\emph default
+ plan and indefinitely in the 
+\emph on
+Premium
+\emph default
+ plan or something.
+ The artists you are allowed to browse or listen too could also be restricted
+ by plans.
+\end_layout
+
+\begin_layout Section
 Underlying Technologies
 \end_layout
 
 \begin_layout Standard
-According to me AppName is distinctive because of the choice of technologies
+According to me Minestrone is distinctive because of the choice of technologies
  it uses.
  While most of today's servers ( of any kind ) use languages like C or C++,
- AppName uses JavaScript!
+ Minestrone uses JavaScript!
 \end_layout
 
 \begin_layout Standard
@@ -210,7 +400,7 @@ target "http://www.kegel.com/c10k.html"
 \end_layout
 
 \begin_layout Standard
-The V8 engine used by node is well known for its speed, achieveing performance
+The V8 engine used by node is well known for its speed, achieving performance
  by compiling JavaScript to native code.
 \begin_inset Foot
 status collapsed
@@ -254,7 +444,7 @@ status collapsed
 
 \begin_layout Plain Layout
 Redis holds the entire DB in memory, except for occasional disk writes.
- Since no data stored in AppName is critical, we can afford the extremely
+ Since no data stored in Minestrone is critical, we can afford the extremely
  small chance of the machine going down between writes.
 \end_layout
 
@@ -264,209 +454,8 @@ Redis holds the entire DB in memory, except for occasional disk writes.
 \end_layout
 
 \begin_layout Standard
-Taking advantage of asynchronous I/O, here is a high-level view of the AppName
- stack.
-\end_layout
-
-\begin_layout Subsubsection
-Protocol
-\end_layout
-
-\begin_layout Standard
-The user interaction is done via normal HTTP with sessions used to store
- some data.
- For now, playlists are permanent and public, but in the future support
- may be added to have them expire after some time or be private
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Commercial-applications"
-
-\end_inset
-
-.
- The SHOUTcast protocol
-\begin_inset Foot
-status collapsed
-
-\begin_layout Plain Layout
-\begin_inset CommandInset href
-LatexCommand href
-target "http://forums.radiotoolbox.com/viewtopic.php?t=74"
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-, used by Nullsoft, is the de-facto standard for HTTP live-streaming and
- is supported by almost all players.
- So AppName implements it.
- The protocol is shown in the Figures
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "fig:Request-response-architecture"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsubsection
-Web Interface
-\end_layout
-
-\begin_layout Standard
-The web interface follows a general Model-View-Controller pattern.
- nerve provides the routing, with JavaScript functions acting as controllers.
- A custom view mechanism, which uses the templating engine from underscore.js
-\begin_inset Foot
-status collapsed
-
-\begin_layout Plain Layout
-\begin_inset CommandInset href
-LatexCommand href
-target "http://documentcloud.github.com/underscore/"
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
- renders the actual HTML.
- The model is just a thin wrapper over Redis to perform various tasks outlined
- in Collection
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:Collection"
-
-\end_inset
-
-Using the keys directly, tracks can be listed by Artist or Album.
- The first time a user clicks 
-\begin_inset Quotes eld
-\end_inset
-
-Add to Playlist
-\begin_inset Quotes erd
-\end_inset
-
- a session is created and song ids are inserted into it as required.
- Once the user is done, he can download the generated .pls file and load
- it into his/her player.
-\end_layout
-
-\begin_layout Subsubsection
-Collection
-\begin_inset CommandInset label
-LatexCommand label
-name "sub:Collection"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The collection is configured simply by setting a top-level root directory.
- SHA1 hashes are used for uniqueness wherever required.
- There is a compromise between space and indexing of meta-data.
- If space is not a constraint, each song could be indexed by all tags like
- genre, year, and so on ( currently only on artist and album ).
-\end_layout
-
-\begin_layout Section
-Commercial applications
-\begin_inset CommandInset label
-LatexCommand label
-name "sec:Commercial-applications"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-AppName is released under a liberal MIT license though, and so it is possible
- to use in a closed environment.
-\end_layout
-
-\begin_layout Standard
-In terms of marketability, no one would want to really 
-\emph on
-purchase
-\emph default
- the product since it has open-source/free alternatives
-\begin_inset Foot
-status collapsed
-
-\begin_layout Plain Layout
-Icecast, gnump3d, NullSoft's own server
-\end_layout
-
-\end_inset
-
-.
- But, AppName combines the features of streaming and of a standard server
- such as gnump3d.
- In general streaming servers, the data is supposed to be provided by 
-\emph on
-sources
-\emph default
-, external servers or other clients which provide actual music.
- In such a case if you want to create a simple personal server, not only
- is setting up the server required, but then you have to configure an external
- client
-\begin_inset Foot
-status collapsed
-
-\begin_layout Plain Layout
-example: ices, 
-\begin_inset CommandInset href
-LatexCommand href
-target "http://www.icecast.org/ices.php"
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-, to which you feed the music.
-\end_layout
-
-\begin_layout Standard
-AppName aims to provide a one or two step setup in which the user should
- simply compile the program and tell it the place where his music is stored
- and start it up.
- For now it runs only on POSIX operating systems, due to the support for
- I/O notifications required.
- This does decrease the market significantly, but considering the rapid
- rise of Linux, especially in home servers ( which are perfect for AppName
- deployment since that is their entire purpose ) I don't think that should
- be a problem.
-\end_layout
-
-\begin_layout Standard
-Commercially it would be quite possible to modify AppName such that a subscripti
-on based model is used.
- Users could be charged a small amount per month to stream the music.
- Playlists could expire after one-time play for free, save them for up to
- a week in the 
-\emph on
-Medium
-\emph default
- plan and indefinitely in the 
-\emph on
-Premium
-\emph default
- plan or something.
- The artists you are allowed to browse or listen too could also be restricted
- by plans.
+Taking advantage of asynchronous I/O, here is a high-level view of the Minestron
+e stack.
 \end_layout
 
 \begin_layout Standard
