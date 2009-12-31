@@ -6,15 +6,7 @@ var _ = require('./../deps/underscore/underscore')._;
 // define an application using request matcher/handler pairs
 var app = [
 
-	[/^\/play\/(\w+)/, function(req, res, hash) {
-// TODO commented but not removed since its a good reference for the /song/ controller
-//        var r = new redis.Client();
-//        r.connect( function() {
-//            r.get('song:'+hash).addCallback( function(meta) {
-//                view.render('info', JSON.parse(meta), _(res.respond).bind(res));
-//            });
-//        });
-	}],
+	[/^\/song\/(\w+)/, controllers.songInfo ],
 
     [/^\/songs/, controllers.listSongs ],
 
@@ -23,6 +15,8 @@ var app = [
 
     [/^\/artist\/(\w+)/, controllers.artist ],
     [/^\/album\/(\w+)/, controllers.album ],
+
+    [/^.*$/, controllers.listArtists ]
 
 	// this handler will respond to any request method
 //	[/b.*/, function(req, res) {
@@ -36,12 +30,10 @@ var app = [
 //  }]
 	
 ];
-process.addListener("SIGINT", function() {
-    sys.debug("called");
-    process.exit();
-});
 
 // create and serve the application with various options
-nerve.create(app, {
-    port: 8000
-}).serve();
+exports.start = function( port ) {
+    nerve.create(app, {
+        port: port
+    }).serve();
+}
