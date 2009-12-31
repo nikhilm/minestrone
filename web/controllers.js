@@ -84,7 +84,7 @@ exports.listSongs = function(req, res) {
     var resp = "";
     utils.newRedis(function() {
         var r = this.redis;
-        r.keys(songk('*')).addCallback( function(songlist) {
+        r.keys($song('*')).addCallback( function(songlist) {
             _.each(songlist, function( songkey, i ) {
                 r.get(songkey).addCallback( function( songdata ) {
                     view.render('info', JSON.parse(songdata), function(out) {
