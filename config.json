@@ -1,5 +1,7 @@
 {
-    "host" : "http://localhost",
-    "port" : 8000,
-    "base" : "/"
+    port : 8000,
+    collection : "/shared/music",
+
+    redis_host : null,
+    redis_port : null
 }
