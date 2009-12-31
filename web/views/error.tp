@@ -1,0 +1,8 @@
+<h1>Oops!</h1>
+
+<p>Minestrone suffered from an error. We are sorry!</p>
+
+<h3>Error message</h3>
+<pre>
+<%= message %>
+</pre>
