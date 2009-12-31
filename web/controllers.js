@@ -3,6 +3,7 @@ var nerve = require('./../deps/nerve/nerve');
 var pls = require('./genpls');
 var redis = require('./../deps/redis-node/redis');
 var view = require('./view');
+var utils = require('./../utils');
 var _ = require('./../deps/underscore/underscore')._;
 
 // a little different
@@ -10,26 +11,31 @@ process.mixin( require('./../utils') )
 
 exports.listArtists = function(req, res, page) {
     page = page || 0;
-    var r = new redis.Client();
-    r.connect( function() {
-        r.lrange($artistnames(), page*10 || 0, (page*10 || 0)+10).addCallback(
-        function(list) {
-            view.output( res, 'artistlist', {
-                'artists':_.map(list || [], function(m) {
-                            return JSON.parse(m);
-                          })
-                , 'title': 'Artists'
+    utils.newRedis(
+        function() {
+            this.redis.lrange($artistnames(), page*10 || 0, (page*10 || 0)+10).addCallback(
+            function(list) {
+                view.output( res, 'artistlist', {
+                    'artists':_.map(list || [], function(m) {
+                                return JSON.parse(m);
+                              })
+                    , 'title': 'Artists'
+                });
             });
-        });
-    });
+        },
+
+        function() {
+            view.output( res, 'error', { message : "Error connecting to database" } );
+        }
+    );
 }
 
 exports.artist = function(req, res, hash) {
-    var r = new redis.Client();
     var output = {
         'songs':[]
     }
-    r.connect( function() {
+    utils.newRedis( function() {
+        var r = this.redis;
         r.smembers( $artistsongs(hash) ).addCallback(
         function(songs) {
             _.each( songs, function(song, index) {
@@ -48,11 +54,11 @@ exports.artist = function(req, res, hash) {
 }
 
 exports.album = function(req, res, hash) {
-    var r = new redis.Client();
     var output = {
         'songs':[]
     }
-    r.connect( function() {
+    utils.newRedis( function() {
+        var r = this.redis;
         r.smembers( $albumsongs(hash) ).addCallback(
         function(songs) {
             _.each( songs, function(song, index) {
@@ -75,9 +81,9 @@ exports.album = function(req, res, hash) {
 
 
 exports.listSongs = function(req, res) {
-    var r = new redis.Client();
     var resp = "";
-    r.connect( function() {
+    utils.newRedis(function() {
+        var r = this.redis;
         r.keys(songk('*')).addCallback( function(songlist) {
             _.each(songlist, function( songkey, i ) {
                 r.get(songkey).addCallback( function( songdata ) {
@@ -89,15 +95,9 @@ exports.listSongs = function(req, res) {
                             r.close();
                         }
                     });
-                }).addErrback( function() {
-                    res.respond("hi2");
-                    res.finish();
-                });
+                })
             });
             r.close();
-        }).addErrback( function() {
-            res.respond("hi3");
-            res.finish();
         });
     });
 }
