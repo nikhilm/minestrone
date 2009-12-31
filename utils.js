@@ -7,7 +7,6 @@ var sys = require('sys')
  * a ':' delimited redis key with prefix
  */
 exports.k = function() {
-    // TODO fix minestrone
     return [ 'minestrone' ].concat( _.toArray(arguments) ).join(':');
 }
 
@@ -47,3 +46,10 @@ exports.$albumsongs = function(hash) {
 exports.$pls = function(id) {
     return exports.k( 'playlist', id );
 }
+
+exports.die = function() {
+    process.stdio.writeError(arguments[0] || "Error");
+    process.stdio.writeError("\n");
+    process.exit(1);
+}
+
