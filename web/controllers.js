@@ -44,7 +44,7 @@ exports.artist = function(req, res, hash) {
                     if( index == songs.length - 1 ) {
                         // getting the artist from the song is cheating, but it works
                         // and is faster and cleaner than another redis query
-                        output['title'] = "Songs by " + JSON.parse(s).artist;
+                        output['title'] = "Artist - " + JSON.parse(s).artist;
                         view.output(res, 'artistsongs', output);
                     }
                 });
@@ -70,7 +70,7 @@ exports.album = function(req, res, hash) {
                         output['songs'] = _.sortBy( output['songs'], function( song ) {
                             return song.track;
                         });
-                        output['title'] = "Songs in " + JSON.parse(s).album;
+                        output['title'] = "Album - " + JSON.parse(s).album;
                         view.output(res, 'albumsongs', output);
                     }
                 });
