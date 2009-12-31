@@ -102,3 +102,10 @@ exports.listSongs = function(req, res) {
     });
 }
 
+exports.songInfo = function( req, res, songhash ) {
+    utils.newRedis( function() {
+        this.redis.get($song(songhash)).addCallback( function(meta) {
+                view.render('info', JSON.parse(meta), _(res.respond).bind(res));
+        });
+    });
+};
