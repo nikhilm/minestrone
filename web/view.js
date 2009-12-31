@@ -37,7 +37,10 @@ exports.render = function( view ) {
 exports.output = function( response, view, data ) {
     var output = "";
 
-    var hfdata = process.mixin({}, data);
+    var hfdata = process.mixin({
+        title : ''
+      , version : GLOBAL['MINESTRONE_VERSION']
+    }, data);
 
     exports.render( 'header', hfdata, function(c) {
         output += c;
