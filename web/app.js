@@ -16,6 +16,8 @@ var app = [
     [/^\/artist\/(\w+)/, controllers.artist ],
     [/^\/album\/(\w+)/, controllers.album ],
 
+    [/^\/playlist\/(\w+)/, controllers.playlist ],
+
     [/^.*$/, controllers.listArtists ]
 
 	// this handler will respond to any request method
