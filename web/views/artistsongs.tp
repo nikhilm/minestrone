@@ -11,6 +11,8 @@
 <td>
     <a href="/album/<%= songs[i].albumHash %>"><%= songs[i].album %></a></li>
 </td>
+
+<td><a href="/playlist/add/<%= songs[i].hash %>">Add to Playlist</a></td>
 </tr>
 <% } %>
 </table>
