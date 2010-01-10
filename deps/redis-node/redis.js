@@ -76,7 +76,7 @@ Client.prototype.connect = function (callback) {
     });
 
     this.conn.addListener("eof", function () {
-      if (this.conn && conn.readyState === "open") {
+      if (self.conn && self.conn.readyState === "open") {
         self.conn.close();
         self.conn = null;
       }
@@ -151,8 +151,6 @@ Client.prototype.handle_multi_bulk_reply = function (buf) {
   var next_reply_at = crlf_at + crlf_len;
   if (count === -1)                   // value doesn't exist
     return [ null, next_reply_at ];  
-  if (count === 0)
-      return [ null, next_reply_at ];
   if (next_reply_at >= buffer.length) 
     return null;
   var results = [];
@@ -288,8 +286,10 @@ function format_bulk_command(name, args) {
 
 function format_multi_bulk_command(name, args) {
   var output = '*' + (args.length + 1) + crlf + '$' + name.length + crlf + name + crlf;
-  for (var i = 0; i < args.length; ++i)
-    output += '$' + args[i].length + crlf + args[i] + crlf;
+  for (var i = 0; i < args.length; ++i) {
+    var arg_as_str = args[i].toString();
+    output += '$' + arg_as_str.length + crlf + arg_as_str + crlf;
+  }
   return output;
 }
 
