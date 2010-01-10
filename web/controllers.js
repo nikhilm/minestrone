@@ -68,6 +68,7 @@ exports.listArtists = function(req, res, page) {
                                 return JSON.parse(m);
                               })
                     , 'title': 'Artists'
+                    , 'message' : req.session['message']
                 });
             });
         },
@@ -79,6 +80,7 @@ exports.listArtists = function(req, res, page) {
 exports.artist = function(req, res, hash) {
     var output = {
         'songs':[]
+      , 'message' : req.session['message']
     }
     utils.newRedis( function() {
         var r = this.redis;
@@ -105,6 +107,7 @@ exports.artist = function(req, res, hash) {
 exports.album = function(req, res, hash) {
     var output = {
         'songs':[]
+      , 'message' : req.session['message']
     }
     utils.newRedis( function() {
         var r = this.redis;
