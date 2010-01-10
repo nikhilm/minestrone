@@ -18,6 +18,45 @@ var dbError = function(res) {
         });
     }
 }
+
+var redirectToReferer = function(req, res, message) {
+    res.sendHeader( 303, { "Location" : req.headers['referer'] } );
+    res.respond( message );
+}
+
+var playlist = exports.playlist = function( req, res, action, arg ) {
+
+    var pls_id = req.session['session_id'];
+    var actions = {
+        'add': function() {
+            playlist.add( pls_id, function(success) {
+                if( success )
+                    req.session['message'] = 'Song Added';
+                else( success )
+                    req.session['message'] = 'error';
+                redirectToReferer( req, res );
+            })
+        }
+      , 'remove': function() {}
+      , 'download': function() {}
+    };
+
+    if( _.isFunction( actions[action] ) )
+        actions[action]( arg );
+
+    if( req.session['test'] )
+        view.output( res, 'playlist', { 'greeting' : req.session['test'] } )
+
+}
+
+var listPlaylist = exports.listPlaylist = function( res ) {
+    util.newRedis(
+        function() {
+        },
+        dbError(res)
+    );
+}
+
 exports.listArtists = function(req, res, page) {
     page = page || 0;
     utils.newRedis(
