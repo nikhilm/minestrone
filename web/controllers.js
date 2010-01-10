@@ -4,6 +4,7 @@ var pls = require('./genpls');
 var redis = require('./../deps/redis-node/redis');
 var view = require('./view');
 var utils = require('./../utils');
+var playlist = require('./playlist');
 var _ = require('./../deps/underscore/underscore')._;
 
 // a little different
