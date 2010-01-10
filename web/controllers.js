@@ -9,6 +9,15 @@ var _ = require('./../deps/underscore/underscore')._;
 // a little different
 process.mixin( require('./../utils') )
 
+
+var dbError = function(res) {
+    return function() {
+        view.output( res, 'error', { 
+            message : "Error connecting to database"
+            , status_code : 500
+        });
+    }
+}
 exports.listArtists = function(req, res, page) {
     page = page || 0;
     utils.newRedis(
@@ -23,10 +32,8 @@ exports.listArtists = function(req, res, page) {
                 });
             });
         },
-
-        function() {
-            view.output( res, 'error', { message : "Error connecting to database" } );
-        }
+        
+        dbError(res)
     );
 }
 
@@ -50,7 +57,10 @@ exports.artist = function(req, res, hash) {
                 });
             });
         });
-    });
+    },
+
+    dbError(res)
+    );
 }
 
 exports.album = function(req, res, hash) {
@@ -76,7 +86,9 @@ exports.album = function(req, res, hash) {
                 });
             });
         });
-    });
+    },
+    dbError(res)
+    );
 }
 
 
@@ -99,7 +111,9 @@ exports.listSongs = function(req, res) {
             });
             r.close();
         });
-    });
+    },
+    dbError(res)
+    );
 }
 
 exports.songInfo = function( req, res, songhash ) {
@@ -107,5 +121,7 @@ exports.songInfo = function( req, res, songhash ) {
         this.redis.get($song(songhash)).addCallback( function(meta) {
                 view.output(res, 'info', JSON.parse(meta));
         });
-    });
+    },
+    dbError(res)
+    );
 };
