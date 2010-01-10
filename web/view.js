@@ -40,6 +40,7 @@ exports.output = function( response, view, data ) {
     var hfdata = process.mixin({
         title : ''
       , version : GLOBAL['MINESTRONE_VERSION']
+      , status_code : 200
     }, data);
 
     exports.render( 'header', hfdata, function(c) {
@@ -51,7 +52,10 @@ exports.output = function( response, view, data ) {
             exports.render( 'footer', hfdata, function(c) {
                 output += c;
 
-                response.respond( output );
+                response.respond({
+                    content: output
+                  , status_code: hfdata.status_code
+                });
             });
         });
     });
