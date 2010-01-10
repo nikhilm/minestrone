@@ -39,6 +39,7 @@ exports.output = function( response, view, data ) {
 
     var hfdata = process.mixin({
         title : ''
+      , message : ''
       , version : GLOBAL['MINESTRONE_VERSION']
       , status_code : 200
     }, data);
@@ -46,7 +47,7 @@ exports.output = function( response, view, data ) {
     exports.render( 'header', hfdata, function(c) {
         output += c;
 
-        exports.render( view, data, function(c) {
+        exports.render( view, hfdata, function(c) {
             output += c;
 
             exports.render( 'footer', hfdata, function(c) {
