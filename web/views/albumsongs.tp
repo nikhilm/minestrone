@@ -15,7 +15,11 @@
     <a href="/artist/<%= songs[i].artistHash %>"><%= songs[i].artist %></a></li>
 </td>
 <td>
-    <a href="/playlist/add/<%= songs[i].hash %>">Add to Playlist</a></li>
+<% if( songs[i].inPlaylist ) { %>
+    <a href="/playlist/remove/<%= songs[i].hash %>">Remove from Playlist</a>
+<% } else { %>
+    <a href="/playlist/add/<%= songs[i].hash %>">Add to Playlist</a>
+<% } %>
 </td>
 </tr>
 <% } %>
