@@ -25,7 +25,7 @@ var redirectToReferer = function(req, res, message) {
     res.respond( message );
 }
 
-var playlist = exports.playlist = function( req, res, action, arg ) {
+var playlistDispatcher = exports.playlist = function( req, res, action, arg ) {
 
     var pls_id = req.session['session_id'];
     var actions = {
