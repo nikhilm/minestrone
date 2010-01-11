@@ -16,7 +16,7 @@ var app = [
     [/^\/artist\/(\w+)/, controllers.artist ],
     [/^\/album\/(\w+)/, controllers.album ],
 
-    [/^\/playlist\/(\w+)/, controllers.playlist ],
+    [/^\/playlist\/(\w+)\/(\w+)?/, controllers.playlist ],
 
     [/^.*$/, controllers.listArtists ]
 
