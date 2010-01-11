@@ -29,13 +29,13 @@ var playlistDispatcher = exports.playlist = function( req, res, action, arg ) {
 
     var pls_id = req.session['session_id'];
     var actions = {
-        'add': function() {
-            playlist.add( pls_id, function(success) {
+        'add': function( song ) {
+            playlist.add( pls_id, song, function(success) {
                 if( success )
                     req.session['message'] = 'Song Added';
-                else( success )
+                else
                     req.session['message'] = 'error';
-                redirectToReferer( req, res );
+                redirectToReferer( req, res, 'Song Added' );
             })
         }
       , 'remove': function() {}
