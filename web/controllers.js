@@ -78,60 +78,53 @@ exports.listArtists = function(req, res, page) {
     );
 }
 
-exports.artist = function(req, res, hash) {
+var listSongsBy = function( req, res, key, cb ) {
     var output = {
         'songs':[]
       , 'message' : req.session['message']
     }
+
     utils.newRedis( function() {
         var r = this.redis;
-        r.smembers( $artistsongs(hash) ).addCallback(
+        r.smembers( key ).addCallback(
         function(songs) {
             _.each( songs, function(song, index) {
                 r.get( $song(song) ).addCallback( function(s) {
-                    output['songs'].push(JSON.parse(s));
+                    output['songs'].push( JSON.parse(s) );
                     if( index == songs.length - 1 ) {
-                        // getting the artist from the song is cheating, but it works
-                        // and is faster and cleaner than another redis query
-                        output['title'] = "Artist - " + JSON.parse(s).artist;
-                        view.output(res, 'artistsongs', output);
+                        cb( output );
                     }
                 });
             });
         });
     },
-
     dbError(res)
     );
 }
 
+exports.artist = function(req, res, hash) {
+    listSongsBy( 
+        req
+      , res
+      , $artistsongs( hash )
+      , function( output ) {
+            output['title'] = "Artist - " + output.songs[0].artist;
+            view.output(res, 'artistsongs', output);
+    });
+}
+
 exports.album = function(req, res, hash) {
-    var output = {
-        'songs':[]
-      , 'message' : req.session['message']
-    }
-    utils.newRedis( function() {
-        var r = this.redis;
-        r.smembers( $albumsongs(hash) ).addCallback(
-        function(songs) {
-            _.each( songs, function(song, index) {
-                r.get( $song(song) ).addCallback( function(s) {
-                    output['songs'].push(JSON.parse(s));
-                    if( index == songs.length - 1 ) {
-                        // getting the artist from the song is cheating, but it works
-                        // and is faster and cleaner than another redis query
-                        output['songs'] = _.sortBy( output['songs'], function( song ) {
-                            return song.track;
-                        });
-                        output['title'] = "Album - " + JSON.parse(s).album;
-                        view.output(res, 'albumsongs', output);
-                    }
-                });
+    listSongsBy(
+        req
+      , res
+      , $albumsongs( hash )
+      , function( output ) {
+            output['songs'] = _.sortBy( output['songs'], function( song ) {
+                return song.track;
             });
-        });
-    },
-    dbError(res)
-    );
+            output['title'] = "Album - " + output.songs[0].album;
+            view.output(res, 'albumsongs', output);
+    });
 }
 
 
