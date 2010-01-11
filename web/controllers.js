@@ -90,10 +90,14 @@ var listSongsBy = function( req, res, key, cb ) {
         function(songs) {
             _.each( songs, function(song, index) {
                 r.get( $song(song) ).addCallback( function(s) {
-                    output['songs'].push( JSON.parse(s) );
-                    if( index == songs.length - 1 ) {
-                        cb( output );
-                    }
+                    playlist.member( req.session['session_id'], song, function(yes_no) {
+                        var sobj = JSON.parse(s);
+                        sobj.inPlaylist = yes_no;
+                        output['songs'].push( sobj );
+                        if( index == songs.length - 1 ) {
+                            cb( output );
+                        }
+                    });
                 });
             });
         });
